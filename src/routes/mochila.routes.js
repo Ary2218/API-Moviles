@@ -4,7 +4,7 @@ const router = Router()
 
 
 router.get('/Mochilas', getMochilas )
-router.post('/Mochila', postMochila)
+router.post('/Mochila/:idViaje', postMochila)
 router.get('/Mochila/:id', getMochila )
 router.delete('/Mochila/:id', deleteMochila)
 router.put('/Mochila/:id', putMochila)

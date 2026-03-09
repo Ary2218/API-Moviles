@@ -1,4 +1,5 @@
 import {conn} from '../../db/db.js'
+import { SacarMochilas } from './MetodosObjeto.js'
 
 export const getViajes = async (req,res) => {
     const [rows] = await conn.query('SELECT * FROM viaje')
@@ -18,14 +19,13 @@ export const getViaje = async (req,res) => {
 }
 
 export const postViaje = async (req,res) => {
-    const {nombre, destino, fecha} = req.body
-    const [result] = await conn.query('INSERT INTO viaje(Nombre, Destino, PesoTotal) VALUES (?,?,?,0)',[nombre,destino,fecha])
+    const {Destino, Fecha} = req.body
+    const [result] = await conn.query('INSERT INTO viaje(Destino, PesoTotal, Fecha) VALUES (?,0,?)',[Destino, Fecha])
 
     res.json({
         id:result.insertId,
-        nombre,
-        destino,
-        fecha
+        Destino,
+        Fecha
     })
 }
 
@@ -41,7 +41,15 @@ export const putViaje = async (req,res) => {
     }
 
 export const deleteViaje = async (req,res) => {
-    const [result] = await conn.query('DELETE * FROM viaje WHERE id = ?', [req.params.id])
+    const Mochilas = SacarMochilas(id)
+
+    await conn.query('DELETE FROM ViajeMochilas WHERE FK_Viaje = ?', [id])
+    for (let i = 0; i<Mochilas; i++){
+    await conn.query('DELETE from MochilaObjeto WHERE FK_Mochila = ?', [Mochilas[0].idMochila])
+    await conn.query('DELETE FROM Objeto where idObjeto in (SELECT FK_Objeto FROM mochilaobjeto WHERE FK_Mochila = ?)', [Mochilas[0].idMochila])
+    await conn.query('DELETE FROM Mochila WHERE idMochila = ?', [Mochilas[0].idMochila])
+    }
+    const [result] = await conn.query('DELETE FROM viaje WHERE id = ?', [req.params.id])
 
     if (result.affectedRows === 0) {
         return res.status(404).json({message: "Viaje no encontrado"});

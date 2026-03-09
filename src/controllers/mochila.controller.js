@@ -1,4 +1,5 @@
 import {conn} from '../../db/db.js'
+import { ActualizarPeso, ActualizarPesoViaje, SacarViaje } from './MetodosObjeto.js'
 
 export const getMochilas = async (req,res) => {
     const [rows] = await conn.query('SELECT * FROM Mochila')
@@ -18,20 +19,25 @@ export const getMochila = async (req,res) => {
 }
 
 export const postMochila = async (req,res) => {
-    const {Nombre, Peso} = req.body
-    const [result] = await conn.query('INSERT INTO Mochila(Nombre, Peso) VALUES (?,0)',[Nombre, Peso])
+    const {idViaje} = req.params
+    const {Nombre} = req.body
 
+    const [result] = await conn.query('INSERT INTO Mochila(Nombre, Peso) VALUES (?,0)',[Nombre])
+    const [idMochilaQuery] = await conn.query('SELECT last_insert_id() AS id;')
+    const idMochila = idMochilaQuery[0].id
+
+    const [relacion] = await conn.query('INSERT INTO viajemochilas VALUES (?,?)', [idViaje, idMochila])
+
+    console.log[relacion]
     res.json({
         id:result.insertId,
-        Nombre,
-        Peso
+        Nombre
     })
 }
 
 export const putMochila = async (req,res) => {
-    const {id} = req.params
     const {nombre} = req.body 
-    const [result] = await conn.query('UPDATE Mochila SET nombre = ?, WHERE id = ?',[nombre, id])
+    const [result] = await conn.query('UPDATE Mochila SET nombre = ?, WHERE id = ?',[nombre, req.params.id])
 
     if (result.affectedRows === 0){
         return res.status(404).json({message: "Mochila no encontrado"});
@@ -40,10 +46,23 @@ export const putMochila = async (req,res) => {
     }
 
 export const deleteMochila = async (req,res) => {
-    const [result] = await conn.query('DELETE * FROM Mochila WHERE id = ?', [req.params.id])
+    let id = req.params.id
+
+    const Viaje = await SacarViaje(id)
+
+    const idViaje = Viaje[0].idViaje
+    
+    await conn.query('DELETE FROM ViajeMochilas WHERE FK_Mochila = ?', [id])
+    await conn.query('DELETE from MochilaObjeto WHERE FK_Mochila = ?', [id])
+    await conn.query('DELETE FROM Objeto where idObjeto in (SELECT FK_Objeto FROM mochilaobjeto WHERE FK_Mochila = ?)', [id])
+    const [result] = await conn.query('DELETE FROM Mochila WHERE idMochila = ?', [id])
 
     if (result.affectedRows === 0) {
         return res.status(404).json({message: "Mochila no encontrado"});
+    }
+
+    if (idViaje){
+        await ActualizarPesoViaje(idViaje)
     }
     res.sendStatus(204)
 }
@@ -57,4 +76,11 @@ export const putMochilaX = async (req,res) => {
         return res.status(404).json({message: "Mochila no encontrado"});
     }
     res.sendStatus(204)
+    }
+
+export const sacarPeso = async (req,res) => {
+        const {idMochila} = req.params
+        ActualizarPeso(idMochila);
+
+        res.sendStatus(204)
     }
