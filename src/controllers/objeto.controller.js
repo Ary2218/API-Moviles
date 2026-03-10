@@ -39,8 +39,8 @@ export const postObjeto = async (req,res) => {
 }
 
 export const putObjeto = async (req,res) => {
-    const {nombre, cantidad, peso} = req.body 
-    const [result] = await conn.query('UPDATE Objeto SET nombre = ?, cantidad = ?, peso = ? WHERE idObjeto = ?',[nombre, cantidad, peso, req.params.idObj])
+    const {Nombre, Cantidad, Peso} = req.body 
+    const [result] = await conn.query('UPDATE Objeto SET nombre = ?, cantidad = ?, peso = ? WHERE idObjeto = ?',[Nombre, Cantidad, Peso, req.params.idObj])
 
     const idMochila = await SacarIDMochila(req.params.idObj)
     ActualizarPeso(idMochila)
@@ -53,9 +53,10 @@ export const putObjeto = async (req,res) => {
 
 
 export const deleteObjeto = async (req,res) => {
-    await conn.query ('DELETE FROM mochilaobjeto WHERE FK_Objeto', [req.params.idObj])
-    const [result] = await conn.query('DELETE * FROM Objeto WHERE idObjeto = ?', [req.params.idObj])
     const idMochila = await SacarIDMochila(req.params.idObj)
+    await conn.query ('DELETE FROM mochilaobjeto WHERE FK_Objeto = ?', [req.params.idObj])
+    const [result] = await conn.query('DELETE FROM Objeto WHERE idObjeto = ?', [req.params.idObj])
+  
     ActualizarPeso(idMochila)
 
     if (result.affectedRows === 0) {
@@ -66,8 +67,8 @@ export const deleteObjeto = async (req,res) => {
 
 
 export const putObjetoX = async (req,res) => {
-    const {nombre, cantidad, peso} = req.body 
-    const [result] = await conn.query('UPDATE Objeto SET nombre = IFNULL(?, nombre), cantidad = IFNULL(?, cantidad), peso = IFNULL(?, peso) WHERE idObjeto = ?',[nombre, cantidad, peso, req.params.idObj])
+    const {Nombre, Cantidad, Peso} = req.body 
+    const [result] = await conn.query('UPDATE Objeto SET nombre = IFNULL(?, nombre), cantidad = IFNULL(?, cantidad), peso = IFNULL(?, peso) WHERE idObjeto = ?',[Nombre, Cantidad, Peso, req.params.idObj])
 
     const idMochila = await SacarIDMochila(req.params.idObj)
     ActualizarPeso(idMochila)

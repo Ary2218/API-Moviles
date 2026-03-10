@@ -36,8 +36,8 @@ export const postMochila = async (req,res) => {
 }
 
 export const putMochila = async (req,res) => {
-    const {nombre} = req.body 
-    const [result] = await conn.query('UPDATE Mochila SET nombre = ?, WHERE id = ?',[nombre, req.params.id])
+    const {Nombre} = req.body 
+    const [result] = await conn.query('UPDATE Mochila SET nombre = ? WHERE idMochila = ?',[Nombre, req.params.id])
 
     if (result.affectedRows === 0){
         return res.status(404).json({message: "Mochila no encontrado"});
@@ -49,13 +49,16 @@ export const deleteMochila = async (req,res) => {
     let id = req.params.id
 
     const Viaje = await SacarViaje(id)
-
     const idViaje = Viaje[0].idViaje
+    const [ObjetosBorrar] = await conn.query('SELECT FK_Objeto FROM mochilaobjeto WHERE FK_Mochila = ?', [id])
     
     await conn.query('DELETE FROM ViajeMochilas WHERE FK_Mochila = ?', [id])
     await conn.query('DELETE from MochilaObjeto WHERE FK_Mochila = ?', [id])
-    await conn.query('DELETE FROM Objeto where idObjeto in (SELECT FK_Objeto FROM mochilaobjeto WHERE FK_Mochila = ?)', [id])
     const [result] = await conn.query('DELETE FROM Mochila WHERE idMochila = ?', [id])
+
+    for (let i = 0; i < ObjetosBorrar.length; i++){
+        await conn.query('DELETE FROM Objeto where idObjeto = ?', [ObjetosBorrar[i].FK_Objeto])
+    }
 
     if (result.affectedRows === 0) {
         return res.status(404).json({message: "Mochila no encontrado"});
@@ -70,7 +73,7 @@ export const deleteMochila = async (req,res) => {
 export const putMochilaX = async (req,res) => {
     const {id} = req.params
     const {nombre, destino, fecha} = req.body 
-    const [result] = await conn.query('UPDATE Mochila SET nombre = IFNULL(?, nombre) WHERE id = ?',[nombre, id])
+    const [result] = await conn.query('UPDATE Mochila SET nombre = IFNULL(?, nombre) WHERE idMochila = ?',[nombre, id])
 
     if (result.affectedRows === 0){
         return res.status(404).json({message: "Mochila no encontrado"});
@@ -78,9 +81,3 @@ export const putMochilaX = async (req,res) => {
     res.sendStatus(204)
     }
 
-export const sacarPeso = async (req,res) => {
-        const {idMochila} = req.params
-        ActualizarPeso(idMochila);
-
-        res.sendStatus(204)
-    }

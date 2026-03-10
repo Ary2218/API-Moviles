@@ -31,8 +31,8 @@ export const postViaje = async (req,res) => {
 
 export const putViaje = async (req,res) => {
     const {id} = req.params
-    const {nombre, destino, fecha} = req.body 
-    const [result] = await conn.query('UPDATE viaje SET nombre = ?, destino = ?, fecha = ? WHERE id = ?',[nombre, destino, fecha, id])
+    const {Destino, Fecha} = req.body 
+    const [result] = await conn.query('UPDATE viaje SET destino = ?, fecha = ? WHERE id = ?'[Destino, Fecha, id])
 
     if (result.affectedRows === 0){
         return res.status(404).json({message: "Viaje no encontrado"});
@@ -40,22 +40,43 @@ export const putViaje = async (req,res) => {
     res.sendStatus(204)
     }
 
-export const deleteViaje = async (req,res) => {
-    const Mochilas = SacarMochilas(id)
+export const deleteViaje = async (req, res) => {
+    const { id } = req.params;
 
-    await conn.query('DELETE FROM ViajeMochilas WHERE FK_Viaje = ?', [id])
-    for (let i = 0; i<Mochilas; i++){
-    await conn.query('DELETE from MochilaObjeto WHERE FK_Mochila = ?', [Mochilas[0].idMochila])
-    await conn.query('DELETE FROM Objeto where idObjeto in (SELECT FK_Objeto FROM mochilaobjeto WHERE FK_Mochila = ?)', [Mochilas[0].idMochila])
-    await conn.query('DELETE FROM Mochila WHERE idMochila = ?', [Mochilas[0].idMochila])
-    }
-    const [result] = await conn.query('DELETE FROM viaje WHERE id = ?', [req.params.id])
+    try {
+        const Mochilas = await SacarMochilas(id);
+        await conn.query('DELETE FROM ViajeMochilas WHERE FK_Viaje = ?', [id]);
 
-    if (result.affectedRows === 0) {
-        return res.status(404).json({message: "Viaje no encontrado"});
+        for (let i = 0; i < Mochilas.length; i++) {
+            const idMochilaActual = Mochilas[i].idMochila;
+
+            const [ObjetosBorrar] = await conn.query(
+                'SELECT FK_Objeto FROM mochilaobjeto WHERE FK_Mochila = ?', 
+                [idMochilaActual]
+            );
+            await conn.query('DELETE FROM MochilaObjeto WHERE FK_Mochila = ?', [idMochilaActual]);
+
+            for (let j = 0; j < ObjetosBorrar.length; j++) {
+                await conn.query('DELETE FROM Objeto WHERE idObjeto = ?', [ObjetosBorrar[j].FK_Objeto]);
+            }
+
+
+            await conn.query('DELETE FROM Mochila WHERE idMochila = ?', [idMochilaActual]);
+        }
+
+        const [result] = await conn.query('DELETE FROM viaje WHERE idViaje = ?', [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Viaje no encontrado" });
+        }
+
+        res.sendStatus(204);
+
+    } catch (error) {
+        console.error("Fallo crítico en deleteViaje:", error);
+        res.status(500).json({ message: "Error al procesar el borrado completo", error: error.message });
     }
-    res.sendStatus(204)
-}
+};
 
 export const putViajeX = async (req,res) => {
     const {id} = req.params
