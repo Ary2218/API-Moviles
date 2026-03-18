@@ -80,8 +80,8 @@ export const deleteViaje = async (req, res) => {
 
 export const putViajeX = async (req,res) => {
     const {id} = req.params
-    const {nombre, destino, fecha} = req.body 
-    const [result] = await conn.query('UPDATE viaje SET nombre = IFNULL(?, nombre), destino = IFNULL(?, destino), fecha = IFNULL(?, fecha) WHERE id = ?',[nombre, destino, fecha, id])
+    const {destino, fecha} = req.body 
+    const [result] = await conn.query('UPDATE viaje SET destino = IFNULL(?, destino), fecha = IFNULL(?, fecha) WHERE idViaje = ?',[destino, fecha, id])
 
     if (result.affectedRows === 0){
         return res.status(404).json({message: "viaje no encontrado"});
