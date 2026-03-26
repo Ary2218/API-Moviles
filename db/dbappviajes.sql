@@ -18,6 +18,32 @@ USE `dbappviajes`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `aerolineas`
+--
+
+DROP TABLE IF EXISTS `aerolineas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `aerolineas` (
+  `idaerolineas` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(45) NOT NULL,
+  `limitepeso` double NOT NULL,
+  `costokgexcedente` double NOT NULL,
+  PRIMARY KEY (`idaerolineas`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `aerolineas`
+--
+
+LOCK TABLES `aerolineas` WRITE;
+/*!40000 ALTER TABLE `aerolineas` DISABLE KEYS */;
+INSERT INTO `aerolineas` VALUES (1,'Aeromexico',150,10),(2,'AeroLinea SOAP',0,20),(3,'AeroLinea SOAP Numero 2',120,35),(4,'AeroLinea SOAP Numero 4',135,94.3),(5,'?',0,0),(6,'SoapUI',123123,123.32);
+/*!40000 ALTER TABLE `aerolineas` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `mochila`
 --
 
@@ -38,7 +64,7 @@ CREATE TABLE `mochila` (
 
 LOCK TABLES `mochila` WRITE;
 /*!40000 ALTER TABLE `mochila` DISABLE KEYS */;
-INSERT INTO `mochila` VALUES (16,'Mochila Prueba',114.5),(17,'Mochila Prueba 2',41.2);
+INSERT INTO `mochila` VALUES (16,'Mochila Prueba',164.5),(17,'Mochila Prueba 2',41.2);
 /*!40000 ALTER TABLE `mochila` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -65,7 +91,7 @@ CREATE TABLE `mochilaobjeto` (
 
 LOCK TABLES `mochilaobjeto` WRITE;
 /*!40000 ALTER TABLE `mochilaobjeto` DISABLE KEYS */;
-INSERT INTO `mochilaobjeto` VALUES (56,16),(57,16),(58,16),(59,17),(60,17);
+INSERT INTO `mochilaobjeto` VALUES (56,16),(57,16),(58,16),(59,17),(60,17),(63,16);
 /*!40000 ALTER TABLE `mochilaobjeto` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -82,7 +108,7 @@ CREATE TABLE `objeto` (
   `Cantidad` int DEFAULT NULL,
   `Nombre` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`idObjeto`)
-) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -91,7 +117,7 @@ CREATE TABLE `objeto` (
 
 LOCK TABLES `objeto` WRITE;
 /*!40000 ALTER TABLE `objeto` DISABLE KEYS */;
-INSERT INTO `objeto` VALUES (56,30,3,'Mochila Prueba 2'),(57,10,2,'Objet'),(58,0.5,9,'Objetos'),(59,4,10,'Objetivo'),(60,0.2,6,'Cosa');
+INSERT INTO `objeto` VALUES (56,30,3,'Mochila Prueba 2'),(57,10,2,'Objet'),(58,0.5,9,'Objetos'),(59,4,10,'Objetivo'),(60,0.2,6,'Cosa'),(61,5,10,'Objeto Prueba sss'),(62,5,10,'Objeto Prueba sss'),(63,5,10,'Objeto Prueba sss');
 /*!40000 ALTER TABLE `objeto` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -117,7 +143,7 @@ CREATE TABLE `viaje` (
 
 LOCK TABLES `viaje` WRITE;
 /*!40000 ALTER TABLE `viaje` DISABLE KEYS */;
-INSERT INTO `viaje` VALUES (4,'Acapulco',155.7,'2026-02-10');
+INSERT INTO `viaje` VALUES (4,'Acapulco',205.7,'2026-10-25');
 /*!40000 ALTER TABLE `viaje` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -165,4 +191,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-09 19:32:23
+-- Dump completed on 2026-03-26 12:02:33

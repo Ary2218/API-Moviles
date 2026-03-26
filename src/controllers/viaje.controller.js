@@ -1,24 +1,34 @@
 import {conn} from '../../db/db.js'
 import { SacarMochilas } from './MetodosObjeto.js'
 
-export const getViajes = async (req,res) => {
+
+export const getViajes = async (req,res, next) => {
+    try{
     const [rows] = await conn.query('SELECT * FROM viaje')
     //Recordatorio: El query regresa un array con objetos 
     //Los objetos tienen la estructura de la tabla
     res.json(rows)
+    } catch(err){
+        next(err)
+    }
 }
 
-export const getViaje = async (req,res) => {
-    const [rows] = await conn.query('SELECT * FROM viaje WHERE id = ?', [req.params.id])
+export const getViaje = async (req,res, next) => {
+    try{
+    const [rows] = await conn.query('SELECT * FROM viaje WHERE idViaje = ?', [req.params.id])
 
     if (rows.length === 0) {
         return res.status(404).json({message: "viaje no encontrado"});
     }
     console.log(rows[0])
     res.json(rows[0])
+    } catch(err) {
+        next(err)
+    }
 }
 
-export const postViaje = async (req,res) => {
+export const postViaje = async (req,res, next) => {
+    try{
     const {Destino, Fecha} = req.body
     const [result] = await conn.query('INSERT INTO viaje(Destino, PesoTotal, Fecha) VALUES (?,0,?)',[Destino, Fecha])
 
@@ -26,10 +36,14 @@ export const postViaje = async (req,res) => {
         id:result.insertId,
         Destino,
         Fecha
-    })
+    }) } catch (err){
+        next(err)
+    }
+
 }
 
-export const putViaje = async (req,res) => {
+export const putViaje = async (req,res, next) => {
+    try{
     const {id} = req.params
     const {Destino, Fecha} = req.body 
     const [result] = await conn.query('UPDATE viaje SET destino = ?, fecha = ? WHERE id = ?'[Destino, Fecha, id])
@@ -38,9 +52,13 @@ export const putViaje = async (req,res) => {
         return res.status(404).json({message: "Viaje no encontrado"});
     }
     res.sendStatus(204)
+    } catch (err){
+        next(err)
     }
+    }
+    
 
-export const deleteViaje = async (req, res) => {
+export const deleteViaje = async (req, res, next) => {
     const { id } = req.params;
 
     try {
@@ -72,13 +90,13 @@ export const deleteViaje = async (req, res) => {
 
         res.sendStatus(204);
 
-    } catch (error) {
-        console.error("Fallo crítico en deleteViaje:", error);
-        res.status(500).json({ message: "Error al procesar el borrado completo", error: error.message });
+    } catch (err) {
+        next(err)
     }
 };
 
-export const putViajeX = async (req,res) => {
+export const putViajeX = async (req,res, next) => {
+    try{
     const {id} = req.params
     const {destino, fecha} = req.body 
     const [result] = await conn.query('UPDATE viaje SET destino = IFNULL(?, destino), fecha = IFNULL(?, fecha) WHERE idViaje = ?',[destino, fecha, id])
@@ -87,4 +105,7 @@ export const putViajeX = async (req,res) => {
         return res.status(404).json({message: "viaje no encontrado"});
     }
     res.sendStatus(204)
+    } catch(err){
+        next(err)
     }
+}
